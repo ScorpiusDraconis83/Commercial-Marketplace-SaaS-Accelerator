@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.Marketplace.SaaS;
 using System;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace Marketplace.SaaS.Accelerator.CustomerSite;
 
@@ -85,7 +88,12 @@ public class Startup
                 options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
-            .AddCookie()
+            .AddCookie(options =>
+            {
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                options.Cookie.MaxAge = options.ExpireTimeSpan;
+                options.SlidingExpiration = true;
+            })
             .AddOpenIdConnect(options =>
             {
                 options.Authority = $"{config.AdAuthenticationEndPoint}/common/v2.0";
@@ -93,14 +101,13 @@ public class Startup
                 options.ResponseType = OpenIdConnectResponseType.IdToken;
                 options.CallbackPath = "/Home/Index";
                 options.SignedOutRedirectUri = config.SignedOutRedirectUri;
-                options.TokenValidationParameters.NameClaimType = ClaimConstants.CLAIM_NAME; //This does not seem to take effect on User.Identity. See Note in CustomClaimsTransformation.cs
+                options.TokenValidationParameters.NameClaimType = ClaimConstants.CLAIM_SHORT_NAME;
                 options.TokenValidationParameters.ValidateIssuer = false;
             });
         services
             .AddTransient<IClaimsTransformation, CustomClaimsTransformation>()
             .AddScoped<ExceptionHandlerAttribute>()
-            .AddScoped<RequestLoggerActionFilter>()
-        ;
+            .AddScoped<RequestLoggerActionFilter>();
 
         if (!Uri.TryCreate(config.FulFillmentAPIBaseURL, UriKind.Absolute, out var fulfillmentBaseApi)) 
         {
@@ -109,14 +116,21 @@ public class Startup
 
         services
             .AddSingleton<IFulfillmentApiService>(new FulfillmentApiService(new MarketplaceSaaSClient(fulfillmentBaseApi, creds), config, new FulfillmentApiClientLogger()))
-            .AddSingleton<SaaSApiClientConfiguration>(config);
+            .AddSingleton<SaaSApiClientConfiguration>(config)
+            .AddSingleton<ValidateJwtToken>();
+
+        // Add the assembly version
+        services.AddSingleton<IAppVersionService>(new AppVersionService(Assembly.GetExecutingAssembly()?.GetName()?.Version));
 
         services
             .AddDbContext<SaasKitContext>(options => options.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection")));
 
         InitializeRepositoryServices(services);
 
-        services.AddMvc(option => option.EnableEndpointRouting = false);
+        services.AddMvc(option => {
+            option.EnableEndpointRouting = false;
+            option.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+        });
     }
 
     /// <summary>

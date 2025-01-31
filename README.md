@@ -1,3 +1,10 @@
+---
+
+The SaaS Accelerator is offered under the MIT License as open source software and is <ins>not supported</ins> by Microsoft.
+If you need help with the accelerator or would like to report defects or feature requests, use the Issues feature on this GitHub repository.
+
+---
+
 # Microsoft Commercial Marketplace - Community Code for SaaS Applications
 
 <!-- no toc -->
@@ -12,6 +19,7 @@
 - [Prerequisites](#prerequisites)
 - [Contributing](#contributing)
 - [Developers](#developers)
+- [FAQs](#faqs)
 - [License](#license)
 
 ---
@@ -64,7 +72,7 @@ This project accelerates the SaaS offer onboarding experience for those building
 
 **Video instructions** Additionally, there is a quick video on the installation process. [Installing the SaaS Accelerator with the Azure portal cloud shell](https://go.microsoft.com/fwlink/?linkid=2196326) available through [Mastering the Marketplace](https://microsoft.github.io/Mastering-the-Marketplace).
 
-**[Upgrade to newer version](./docs/Installation-Instructions.md#update-to-a-newer-version-of-the-saas-accelerator)** Follow these instructions to move your 6.x release to the current version.
+**[Upgrade to newer version](./docs/Installation-Instructions.md#update-to-a-newer-version-of-the-saas-accelerator)** Follow these instructions to move your release to the current version.
 
 ### Additional technical documents
 
@@ -79,8 +87,8 @@ This project accelerates the SaaS offer onboarding experience for those building
 The following documents provide how-tos for setting up Azure Monitoring and Alerting for the resources deployed by the SaaS Accelerator:
 
 - [Web App Monitoring and Alerting instructions](./docs/WebApp-Monitoring.md)
-- [SQL Server Monitoring and Alerting instructions](./docs/WebApp-Monitoring.md)
-- [App Registration Credentials Monitoring and Alerting instructions](./docs/WebApp-Monitoring.md)
+- [SQL Server Monitoring and Alerting instructions](./docs/SQL-Server-Monitoring.md)
+- [App Registration Credentials Monitoring and Alerting instructions](./docs/App-Reg-Monitoring.md)
 
 ## Commercial Marketplace Documentation
 
@@ -103,7 +111,7 @@ The source `/src` directory contains the following Visual Studio projects.
 
 | Project | Description | Directory Name |
 | --- | --- | --- |
-| [**Customer portal - Sample web application**](./src/CustomerSite) | Demonstrates how to register, provision, and activate the marketplace subscription. Implemented using ASP.Net Core 6.0, the sample web application uses the Services client library and data access library to invoke and persist API interactions and provides an example user interface to demonstrate how a customer would manage their subscriptions and plans. |CustomerSite|
+| [**Customer portal - Sample web application**](./src/CustomerSite) | Demonstrates how to register, provision, and activate the marketplace subscription. Implemented using ASP.Net Core 8.0, the sample web application uses the Services client library and data access library to invoke and persist API interactions and provides an example user interface to demonstrate how a customer would manage their subscriptions and plans. |CustomerSite|
 | [**Publisher portal - Sample web application**](./src/AdminSite) | Demonstrates how to generate usage events used in metered billing transactions, and how to emit these events to the Marketplace Metering Service API. |AdminSite|
 | [**Client data access library**](./src/DataAccess) | Demonstrates how to persist plans, marketplace subscriptions, and related transaction attributes when using the SaaS Fulfillment API (v2) and Marketplace Metering Service API. |DataAccess |
 | [**Services client library**](./src/Services) | Contains the services used by the Customer and Publisher portals, including the POCO classes to orchestrate calls to the marketplace APIs on [client library](https://github.com/microsoft/commercial-marketplace-client-dotnet) / database.|Services |
@@ -117,13 +125,13 @@ The sample code in this repository runs in the publisher's environment as illust
 
 This project has been developed using the following technologies and versions:
 
-- [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
-- [ASP.NET Core Runtime 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+- [.NET 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+- [ASP.NET Core Runtime 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 - [Entity Framework](https://docs.microsoft.com/ef/)
 
 ## Security
 
-The accelerator code has been scanned for vulnerabilities and use secure configurations. Versions have been reviewed to ensure compatibility with the latest security guidelines.
+The accelerator code has been scanned for vulnerabilities and use secure configurations. Versions have been reviewed to ensure compatibility with the latest security guidelines. To enhance the best practices please see [Security best practices](./docs/Security-Best-Practices.md).
 
 ## Prerequisites
 
@@ -132,7 +140,7 @@ Ensure the following prerequisites are met before getting started:
 - You must have an active Azure subscription for development and testing purposes. Create an Azure subscription [here](https://azure.microsoft.com/free/).
 - You must have a Partner Center account enabled for use with the commercial marketplace. Create an account [here](https://docs.microsoft.com/azure/marketplace/partner-center-portal/create-account).
 - We recommend using an Integrated Development Environment (IDE):  [Visual Studio Code](https://code.visualstudio.com/),  [Visual Studio 2019 / 2022](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=16#), etc...
-- The SaaS Accelerator has been implemented using [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+- The SaaS Accelerator has been implemented using [.NET 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 - For data persistence we are using [Azure SQL Database](https://azure.microsoft.com/services/sql-database/) and [Entity Framework](https://docs.microsoft.com/ef/). However, feel free to use any data repository you are comfortable with.  
 
 ## Contributing
@@ -152,6 +160,10 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 ## Developers
 
 Code contributed should follow the C# specifications and best practices as documented [here](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/inside-a-program/coding-conventions).
+
+## FAQs
+
+There is a list of the Frequent Asked Questions [here](./docs/FAQs.md).
 
 ## License
 

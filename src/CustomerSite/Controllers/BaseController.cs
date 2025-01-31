@@ -1,9 +1,11 @@
 ﻿using System.Linq;
 using Marketplace.SaaS.Accelerator.Services.Models;
+using Marketplace.SaaS.Accelerator.Services.Services;
 using Marketplace.SaaS.Accelerator.Services.Utilities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Marketplace.SaaS.Accelerator.CustomerSite.Controllers;
 
@@ -13,12 +15,22 @@ namespace Marketplace.SaaS.Accelerator.CustomerSite.Controllers;
 /// <seealso cref="Microsoft.AspNetCore.Mvc.Controller" />
 public class BaseController : Controller
 {
+
+    private readonly IAppVersionService _appVersionService;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="BaseController"/> class.
     /// </summary>
-    public BaseController()
+    public BaseController(IAppVersionService appVersionService)
     {
+        _appVersionService = appVersionService;
         this.CheckAuthentication();
+    }
+
+    public override void OnActionExecuting(ActionExecutingContext context)
+    {
+        base.OnActionExecuting(context);
+        ViewData["AppVersion"] = _appVersionService.Version;
     }
 
     /// <summary>
@@ -45,7 +57,24 @@ public class BaseController : Controller
     {
         get
         {
-            return HttpContext?.User?.Claims?.FirstOrDefault(s => s.Type == ClaimConstants.CLAIM_NAME)?.Value ?? string.Empty;
+            if (this.HttpContext != null && this.HttpContext.User.Claims.Count() > 0)
+            {
+                var shortNameClaim = this.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimConstants.CLAIM_SHORT_NAME);
+                if (shortNameClaim != null)
+                {
+                    return shortNameClaim.Value;
+                }
+                else
+                {
+                    var fullNameClaim = this.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimConstants.CLAIM_NAME);
+                    if (fullNameClaim != null)
+                    {
+                        return fullNameClaim.Value;
+                    }
+                }
+            }
+
+            return string.Empty;
         }
     }
 

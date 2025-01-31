@@ -1,3 +1,10 @@
+---
+
+The SaaS Accelerator is offered under the MIT License as open source software and is <ins>not supported</ins> by Microsoft. <br>
+If you need help with the accelerator or would like to report defects or feature requests, use the Issues feature on this GitHub repository.
+
+---
+
 # Install the Azure Marketplace SaaS Accelerator using Azure Cloud Shell
 
 <!-- no toc -->
@@ -29,10 +36,10 @@ Copy the following section to an editor and update it to match your company pref
 ``` powershell
 wget https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh; `
 chmod +x dotnet-install.sh; `
-./dotnet-install.sh -version 6.0.417; `
+./dotnet-install.sh -version 8.0.303; `
 $ENV:PATH="$HOME/.dotnet:$ENV:PATH"; `
-dotnet tool install --global dotnet-ef --version 6.0.1; `
-git clone https://github.com/Azure/Commercial-Marketplace-SaaS-Accelerator.git -b 7.5.1 --depth 1; `
+dotnet tool install --global dotnet-ef --version 8.0.0; `
+git clone https://github.com/Azure/Commercial-Marketplace-SaaS-Accelerator.git -b 8.0.0 --depth 1; `
 cd ./Commercial-Marketplace-SaaS-Accelerator/deployment; `
 .\Deploy.ps1 `
  -WebAppNamePrefix "SOME-UNIQUE-STRING" `
@@ -44,7 +51,7 @@ cd ./Commercial-Marketplace-SaaS-Accelerator/deployment; `
 The script above will perform the following actions.
 
 - Create required App Registration for SaaS Marketplace API authentication
-- Create required Aoo Registration for SSO on your Landing Page
+- Create required App Registration for SSO on your Landing Page
 - Deploy required infrastructure in Azure for hosting the landing page, webhook and admin portal
 - Deploy the code and database on the infrastructure.
 
@@ -60,6 +67,7 @@ The script above will perform the following actions.
  -ADMTApplicationID "xxxx-xxx-xxx-xxx-xxxx" `
  -LogoURLpng "https://company_com/company_logo.png" `
  -LogoURLico "https://company_com/company_logo.ico" `
+ -IsAdminPortalMultiTenant "true" `
  -Quiet
  ```
 
@@ -70,13 +78,14 @@ The script above will perform the following actions.
 If you already have deployed the SaaS Accelerator, but you want to update it so that you take advantage of new features developed, you can run the following command:
 
 *you need to ensure that you use the same parameters you used in the initial deployment 
+*if upgrading to release version < 8.0.0, please replace the below dotnet and dotnet-ef versions to 6 release.
 
 ``` powershell
 wget https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh; `
 chmod +x dotnet-install.sh; `
-./dotnet-install.sh -version 6.0.417; `
+./dotnet-install.sh -version 8.0.303; `
 $ENV:PATH="$HOME/.dotnet:$ENV:PATH"; `
-dotnet tool install --global dotnet-ef --version 6.0.1; `
+dotnet tool install --global dotnet-ef --version 8.0.0; `
 git clone https://github.com/Azure/Commercial-Marketplace-SaaS-Accelerator.git -b <release-version-branch-to-deploy> --depth 1; `
 cd ./Commercial-Marketplace-SaaS-Accelerator/deployment; `
 .\Upgrade.ps1 `
@@ -98,10 +107,9 @@ cd ./Commercial-Marketplace-SaaS-Accelerator/deployment; `
 | ADApplicationSecret | Valid secret for the ADApplication. Required if ADApplicationID is provided. If `ADApplicationID` is not provided, a secret will be generated. |
 | ADMTApplicationID | A valid App Id for an Azure AD Application configured for SSO login. If value not provided, a new application will be created. |
 | SQLServerName | A unique name of the database server (without database.windows.net). Default: `WebAppNamePrefix`-sql |
-| SQLAdminLogin | SQL Admin login. Default: 'saasdbadminxxx' where xxx is a random number. |
-| SQLAdminLoginPassword | SQL Admin password. Default: secure random password. |
 | LogoURLpng | The url of the company logo image in .png format with a size of 96x96 to be used on the website |
 | LogoURLico | The url of the company logo image in .ico format |
+| IsAdminPortalMultiTenant | Set to `true` if you want to enable multi-tenant support for the admin portal. Default: `false` |
 | Quiet | Disable verbose output when running the script
 
 ## Setting up a development environment
@@ -114,3 +122,7 @@ The video is rather lengthy, so use the chapter links in the video description t
 
 ## Alternative deployments
 There are other ways to deploy the SaaS Accelerator environment (e.g. development, maual deployment, etc).  Additional instruction can be found [here](Advanced-Instructions.md).
+
+## Authentication between the WebApps and the Database
+The Webapps uses Managed Identity to communicate with the database. The Managed Identity is created during the deployment of the WebApps. The Managed Identity is then used to create a user in the database and grant the user the necessary permissions. The connection string used by the WebApps to connect to the database is then updated to use the Managed Identity.
+For more information on how App Service use Managed Identity to connect to the database, please refer to the following [link](https://learn.microsoft.com/en-us/azure/app-service/tutorial-connect-msi-sql-database).
